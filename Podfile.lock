@@ -5,12 +5,12 @@ DEPENDENCIES:
   - JoyConSwift (= 0.2.1)
 
 SPEC REPOS:
-  trunk:
+  https://mirrors.tuna.tsinghua.edu.cn/git/CocoaPods/Specs.git:
     - JoyConSwift
 
 SPEC CHECKSUMS:
   JoyConSwift: a8025cc234394cbc38fc1b48cfe1de8de6f66551
 
-PODFILE CHECKSUM: f077d9a7d63235de745659f9e64c4c8ec6de86af
+PODFILE CHECKSUM: 8642a17bea09b9e40e6eb026a2968999692c3bc5
 
-COCOAPODS: 1.9.3
+COCOAPODS: 1.15.2

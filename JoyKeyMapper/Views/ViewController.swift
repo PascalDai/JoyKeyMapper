@@ -12,14 +12,18 @@ import JoyConSwift
 
 class ViewController: NSViewController {
     
+    // 界面元素
     @IBOutlet weak var controllerCollectionView: NSCollectionView!
     @IBOutlet weak var appTableView: NSTableView!
     @IBOutlet weak var appAddRemoveButton: NSSegmentedControl!
     @IBOutlet weak var configTableView: NSOutlineView!
     
+    // 获取应用程序代理
     var appDelegate: AppDelegate? {
         return NSApplication.shared.delegate as? AppDelegate
     }
+    
+    // 当前选中的控制器
     var selectedController: GameController? {
         didSet {
             self.appTableView.reloadData()
@@ -27,9 +31,13 @@ class ViewController: NSViewController {
             self.updateAppAddRemoveButtonState()
         }
     }
+    
+    // 当前选中控制器的数据
     var selectedControllerData: ControllerData? {
         return self.selectedController?.data
     }
+    
+    // 当前选中的应用程序配置
     var selectedAppConfig: AppConfig? {
         guard let data = self.selectedControllerData else {
             return nil
@@ -40,12 +48,15 @@ class ViewController: NSViewController {
         }
         return data.appConfigs?[row - 1] as? AppConfig
     }
+    
+    // 当前选中的按键配置
     var selectedKeyConfig: KeyConfig? {
         if self.appTableView.selectedRow < 0 {
             return nil
         }
         return self.selectedAppConfig?.config ?? self.selectedControllerData?.defaultConfig
     }
+    
     var keyDownHandler: Any?
 
     override func viewDidLoad() {
@@ -53,6 +64,7 @@ class ViewController: NSViewController {
 
         if self.controllerCollectionView == nil { return }
         
+        // 设置代理和数据源
         self.controllerCollectionView.delegate = self
         self.controllerCollectionView.dataSource = self
         
@@ -64,6 +76,7 @@ class ViewController: NSViewController {
         
         self.updateAppAddRemoveButtonState()
 
+        // 添加通知观察者
         NotificationCenter.default.addObserver(self, selector: #selector(controllerAdded), name: .controllerAdded, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(controllerRemoved), name: .controllerRemoved, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(controllerConnected), name: .controllerConnected, object: nil)
@@ -71,18 +84,9 @@ class ViewController: NSViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(controllerIconChanged), name: .controllerIconChanged, object: nil)
     }
     
-    override func viewDidDisappear() {
-
-    }
-
-    override var representedObject: Any? {
-        didSet {
-        // Update the view, if already loaded.
-        }
-    }
+    // MARK: - 应用程序相关方法
     
-    // MARK: - Apps
-    
+    // 处理添加/删除应用程序按钮点击
     @IBAction func clickAppSegmentButton(_ sender: NSSegmentedControl) {
         let selectedSegment = sender.selectedSegment
         
@@ -93,6 +97,7 @@ class ViewController: NSViewController {
         }
     }
     
+    // 更新添加/删除应用程序按钮状态
     func updateAppAddRemoveButtonState() {
         if self.selectedController == nil {
             self.appAddRemoveButton.setEnabled(false, forSegment: 0)
@@ -106,6 +111,7 @@ class ViewController: NSViewController {
         }        
     }
     
+    // 添加应用程序
     func addApp() {
         guard let controller = self.selectedController else { return }
         
@@ -126,6 +132,7 @@ class ViewController: NSViewController {
         }
     }
     
+    // 删除应用程序
     func removeApp() {
         guard let controller = self.selectedController else { return }
         guard let appConfig = self.selectedAppConfig else { return }
@@ -145,26 +152,30 @@ class ViewController: NSViewController {
         }
     }
     
-    // MARK: - Controllers
+    // MARK: - 控制器相关方法
     
+    // 处理控制器添加通知
     @objc func controllerAdded() {
         DispatchQueue.main.async { [weak self] in
             self?.controllerCollectionView.reloadData()
         }
     }
     
+    // 处理控制器连接通知
     @objc func controllerConnected() {
         DispatchQueue.main.async { [weak self] in
             self?.controllerCollectionView.reloadData()
         }
     }
     
+    // 处理控制器断开连接通知
     @objc func controllerDisconnected() {
         DispatchQueue.main.async { [weak self] in
             self?.controllerCollectionView.reloadData()
         }
     }
     
+    // 处理控制器移除通知
     @objc func controllerRemoved(_ notification: NSNotification) {
         guard let gameController = notification.object as? GameController else { return }
         
@@ -182,6 +193,7 @@ class ViewController: NSViewController {
         }
     }
     
+    // 处理控制器图标变更通知
     @objc func controllerIconChanged(_ notification: NSNotification) {
         guard let gameController = notification.object as? GameController else { return }
         
@@ -190,31 +202,21 @@ class ViewController: NSViewController {
         }
     }
     
-    // MARK: - Import
+    // MARK: - 导入/导出方法
     
+    // 导入按键映射
     @IBAction func importKeyMappings(_ sender: NSButton) {
+        // 待实现
     }
     
-    // MARK: - Export
-    
+    // 导出按键映射
     @IBAction func exportKeyMappngs(_ sender: NSButton) {
-        return
-        /*
-        guard let dataManager = self.appDelegate?.dataManager else { return }
-
-        let savePanel = NSSavePanel()
-        savePanel.message = NSLocalizedString("Save key mapping data", comment: "Save key mapping data")
-        savePanel.allowedFileTypes = ["jkmap"]
-        
-        savePanel.begin { response in
-            guard response == .OK else { return }
-            guard let filePath = savePanel.url?.absoluteString.removingPercentEncoding else { return }
-        }
-        */
+        // 待实现
     }
     
-    // MARK: - Options
+    // MARK: - 选项
     
+    // 显示应用程序设置
     @IBAction func didPushOptions(_ sender: NSButton) {
         guard let controller = self.storyboard?.instantiateController(withIdentifier: "AppSettingsViewController") as? AppSettingsViewController else { return }
         

@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 51;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -58,6 +58,9 @@
 		475E07CC10AB2EDFD3A1DE83 /* Pods-JoyKeyMapper.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-JoyKeyMapper.release.xcconfig"; path = "Target Support Files/Pods-JoyKeyMapper/Pods-JoyKeyMapper.release.xcconfig"; sourceTree = "<group>"; };
 		480DB1F0DAF805C943A9656A /* Pods_JoyKeyMapper.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_JoyKeyMapper.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AE0B679D3FC9AD29E57D0287 /* Pods-JoyKeyMapper.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-JoyKeyMapper.debug.xcconfig"; path = "Target Support Files/Pods-JoyKeyMapper/Pods-JoyKeyMapper.debug.xcconfig"; sourceTree = "<group>"; };
+		AFC070B92CB912B000B4B309 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = "zh-Hans"; path = "zh-Hans.lproj/Main.storyboard"; sourceTree = "<group>"; };
+		AFC070BA2CB912B000B4B309 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		AFC070BB2CB912B000B4B309 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = "zh-Hans"; path = "zh-Hans.lproj/Main.storyboard"; sourceTree = "<group>"; };
 		DD0389E72497D911009090BE /* MetaKeyState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetaKeyState.swift; sourceTree = "<group>"; };
 		DD05302D24272D7A0091B3C6 /* DataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataManager.swift; sourceTree = "<group>"; };
 		DD05302E24272D7A0091B3C6 /* GameController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameController.swift; sourceTree = "<group>"; };
@@ -338,6 +341,7 @@
 			knownRegions = (
 				en,
 				ja,
+				"zh-Hans",
 			);
 			mainGroup = DD0AE2D822DAB13100B68F05;
 			productRefGroup = DD0AE2E222DAB13100B68F05 /* Products */;
@@ -480,6 +484,7 @@
 			children = (
 				DD0530602427AB6B0091B3C6 /* en */,
 				DD0530612427AB7B0091B3C6 /* ja */,
+				AFC070B92CB912B000B4B309 /* zh-Hans */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -489,6 +494,7 @@
 			children = (
 				DD05305F2427AB6B0091B3C6 /* en */,
 				DD0530622427AB7B0091B3C6 /* ja */,
+				AFC070BB2CB912B000B4B309 /* zh-Hans */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -498,6 +504,7 @@
 			children = (
 				DDA072B2246699C500F9B80B /* en */,
 				DDA072B4246699CA00F9B80B /* ja */,
+				AFC070BA2CB912B000B4B309 /* zh-Hans */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -631,16 +638,16 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 10;
-				DEVELOPMENT_TEAM = EF37D6UQZ9;
+				CURRENT_PROJECT_VERSION = 11;
+				DEVELOPMENT_TEAM = MRS8TT7754;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/JoyKeyMapper/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = jp.0spec.JoyKeyMapper;
+				MARKETING_VERSION = 1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = JoyKeyMapper;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = NO;
@@ -657,16 +664,16 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 10;
-				DEVELOPMENT_TEAM = EF37D6UQZ9;
+				CURRENT_PROJECT_VERSION = 11;
+				DEVELOPMENT_TEAM = MRS8TT7754;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/JoyKeyMapper/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = jp.0spec.JoyKeyMapper;
+				MARKETING_VERSION = 1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = JoyKeyMapper;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = NO;
@@ -683,7 +690,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
-				DEVELOPMENT_TEAM = EF37D6UQZ9;
+				DEVELOPMENT_TEAM = MRS8TT7754;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/JoyKeyMapperLauncher/Info.plist";
@@ -709,7 +716,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
-				DEVELOPMENT_TEAM = EF37D6UQZ9;
+				DEVELOPMENT_TEAM = MRS8TT7754;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/JoyKeyMapperLauncher/Info.plist";

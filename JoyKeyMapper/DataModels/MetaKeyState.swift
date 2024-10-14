@@ -8,6 +8,7 @@
 
 import InputMethodKit
 
+// 定义特殊键的虚拟键码
 private let shiftKey = Int32(kVK_Shift)
 private let optionKey = Int32(kVK_Option)
 private let controlKey = Int32(kVK_Control)
@@ -15,12 +16,13 @@ private let commandKey = Int32(kVK_Command)
 private let metaKeys = [kVK_Shift, kVK_Option, kVK_Control, kVK_Command]
 private var pushedKeyConfigs = Set<KeyMap>()
 
+// 重置所有特殊键的状态
 func resetMetaKeyState() {
     let source = CGEventSource(stateID: .hidSystemState)
     pushedKeyConfigs.removeAll()
 
     DispatchQueue.main.async {
-        // Release all meta keys
+        // 释放所有特殊键
         metaKeys.forEach {
             let ev = CGEvent(keyboardEventSource: source, virtualKey: CGKeyCode($0), keyDown: false)
             ev?.post(tap: .cghidEventTap)
@@ -28,6 +30,7 @@ func resetMetaKeyState() {
     }
 }
 
+// 获取当前特殊键的状态
 func getMetaKeyState() -> (shift: Bool, option: Bool, control: Bool, command: Bool) {
     var shift: Bool = false
     var option: Bool = false
@@ -46,7 +49,8 @@ func getMetaKeyState() -> (shift: Bool, option: Bool, control: Bool, command: Bo
 }
 
 /**
- * This command must be called in the main thread
+ * 处理特殊键事件
+ * 此函数必须在主线程中调用
  */
 func metaKeyEvent(config: KeyMap, keyDown: Bool) {
     var shift: Bool
@@ -55,17 +59,19 @@ func metaKeyEvent(config: KeyMap, keyDown: Bool) {
     var command: Bool
     
     if keyDown {
-        // Check if meta keys are not pressed before pressing keys
+        // 按下键之前检查特殊键是否已被按下
         (shift, option, control, command) = getMetaKeyState()
         pushedKeyConfigs.insert(config)
     } else {
         pushedKeyConfigs.remove(config)
-        // Check if meta keys are not pressed after releasing keys
+        // 释放键之后检查特殊键是否仍被按下
         (shift, option, control, command) = getMetaKeyState()
     }
     
     let source = CGEventSource(stateID: .hidSystemState)
     let modifiers = NSEvent.ModifierFlags(rawValue: UInt(config.modifiers))
+    
+    // 根据需要发送特殊键事件
     if !shift && modifiers.contains(.shift) {
         let ev = CGEvent(keyboardEventSource: source, virtualKey: CGKeyCode(kVK_Shift), keyDown: keyDown)
         ev?.post(tap: .cghidEventTap)

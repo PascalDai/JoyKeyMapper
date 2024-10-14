@@ -50,7 +50,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, UNUserNoti
             guard let dataManager = manager else { return }
 
             dataManager.controllers.forEach { data in
-                let gameController = GameController(data: data)
+                let gameController = GameController(data: data, dataManager: dataManager)
                 strongSelf.controllers.append(gameController)
             }
             _ = strongSelf.manager.runAsync()
@@ -221,7 +221,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, UNUserNoti
     func addController(_ controller: JoyConSwift.Controller) {
         guard let dataManager = self.dataManager else { return }
         let controllerData = dataManager.getControllerData(controller: controller)
-        let gameController = GameController(data: controllerData)
+        let gameController = GameController(data: controllerData,dataManager: self.dataManager!)
         gameController.controller = controller
         gameController.startTimer()
         self.controllers.append(gameController)

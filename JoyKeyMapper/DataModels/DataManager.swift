@@ -9,6 +9,7 @@
 import CoreData
 import JoyConSwift
 
+// 定义摇杆类型
 enum StickType: String {
     case Mouse = "Mouse"
     case MouseWheel = "Mouse Wheel"
@@ -16,6 +17,7 @@ enum StickType: String {
     case None = "None"
 }
 
+// 定义摇杆方向
 enum StickDirection: String {
     case Left = "Left"
     case Right = "Right"
@@ -26,10 +28,12 @@ enum StickDirection: String {
 class DataManager: NSObject {
     let container: NSPersistentContainer
 
+    // 获取撤销管理器
     var undoManager: UndoManager? {
         return self.container.viewContext.undoManager
     }
     
+    // 获取所有控制器数据
     var controllers: [ControllerData] {
         let context = self.container.viewContext
         let request = NSFetchRequest<NSFetchRequestResult>(entityName: "ControllerData")
@@ -42,23 +46,14 @@ class DataManager: NSObject {
         }
     }
     
+    // 初始化数据管理器
     init(completion: @escaping (DataManager?) -> Void) {
         self.container = NSPersistentContainer(name: "JoyKeyMapper")
         super.init()
         
         self.container.loadPersistentStores { [weak self] (storeDescription, error) in
             if let error = error {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                
-                /*
-                 Typical reasons for an error here include:
-                 * The parent directory does not exist, cannot be created, or disallows writing.
-                 * The persistent store is not accessible, due to permissions or data protection when the device is locked.
-                 * The device is out of space.
-                 * The store could not be migrated to the current model version.
-                 Check the error message to determine what the actual problem was.
-                 */
+                // 处理错误
                 fatalError("Unresolved error \(error)")
             }
             self?.container.viewContext.automaticallyMergesChangesFromParent = true
@@ -68,6 +63,7 @@ class DataManager: NSObject {
         }
     }
     
+    // 保存数据
     func save() -> Bool {
         let context = self.container.viewContext
          
@@ -147,8 +143,9 @@ class DataManager: NSObject {
         return nil
     }
 
-    // MARK: - ControllerData
-    
+    // MARK: - 创建各种数据对象的方法
+
+    // 创建控制器数据
     func createControllerData(type: JoyCon.ControllerType) -> ControllerData {
         let controller = ControllerData(context: self.container.viewContext)
         controller.appConfigs = []
@@ -178,8 +175,7 @@ class DataManager: NSObject {
         return controller
     }
     
-    // MARK: - AppConfig
-    
+    // 创建应用程序配置
     func createAppConfig(type: JoyCon.ControllerType) -> AppConfig {
         let appConfig = AppConfig(context: self.container.viewContext)
         appConfig.app = self.createAppData()
@@ -188,16 +184,13 @@ class DataManager: NSObject {
         return appConfig
     }
 
-    // MARK: - AppData
-
+    // 创建应用程序数据
     func createAppData() -> AppData {
         let appData = AppData(context: self.container.viewContext)
-
         return appData
     }
 
-    // MARK: - KeyConfig
-
+    // 创建按键配置
     func createKeyConfig(type: JoyCon.ControllerType) -> KeyConfig {
         let keyConfig = KeyConfig(context: self.container.viewContext)
         
@@ -213,16 +206,13 @@ class DataManager: NSObject {
         return keyConfig
     }
 
-    // MARK: - KeyMap
-
+    // 创建按键映射
     func createKeyMap() -> KeyMap {
         let keyMap = KeyMap(context: self.container.viewContext)
-        
         return keyMap
     }
     
-    // MARK: - StickConfig
-    
+    // 创建摇杆配置
     func createStickConfig() -> StickConfig {
         let stickConfig = StickConfig(context: self.container.viewContext)
 
@@ -248,8 +238,9 @@ class DataManager: NSObject {
         return stickConfig
     }
     
-    // MARK: - Common
+    // MARK: - 通用方法
     
+    // 删除托管对象
     func delete(_ object: NSManagedObject) {
         self.container.viewContext.delete(object)
     }

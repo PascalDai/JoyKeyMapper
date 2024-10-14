@@ -9,6 +9,7 @@
 import JoyConSwift
 import InputMethodKit
 
+// 扩展JoyCon.BatteryStatus以提供本地化字符串
 extension JoyCon.BatteryStatus {
     static let stringMap: [JoyCon.BatteryStatus: String] = [
         .empty: "Empty",
@@ -30,6 +31,8 @@ extension JoyCon.BatteryStatus {
 
 class GameController {
     let data: ControllerData
+    let dataManager: DataManager
+    
 
     var type: JoyCon.ControllerType
     var bodyColor: NSColor
@@ -75,8 +78,9 @@ class GameController {
         return (self.controller?.battery ?? .unknown).localizedString
     }
 
-    init(data: ControllerData) {
+    init(data: ControllerData,dataManager: DataManager) {
         self.data = data
+        self.dataManager = dataManager
         
         guard let defaultConfig = self.data.defaultConfig else {
             fatalError("Failed to get defaultConfig")
@@ -499,27 +503,20 @@ class GameController {
         self.currentRStickConfig = newRightStickMap
     }
     
+    // 添加应用程序配置
     func addApp(url: URL) {
-        guard let delegate = NSApplication.shared.delegate as? AppDelegate else { return }
-        guard let manager = delegate.dataManager else { return }
         guard let bundle = Bundle(url: url) else { return }
-        guard let info = bundle.infoDictionary else { return }
-
-        let bundleID = info["CFBundleIdentifier"] as? String ?? ""
-        let appIndex = self.data.appConfigs?.index(ofObjectPassingTest: { (obj, index, stop) in
-            guard let appConfig = obj as? AppConfig else { return false }
-            return appConfig.app?.bundleID == bundleID
-        })
-        if appIndex != nil && appIndex != NSNotFound {
-            // The selected app has been already added.
-            return
-        }
+        guard let bundleID = bundle.bundleIdentifier else { return }
         
-        let appConfig = manager.createAppConfig(type: self.type)
-        // appConfig.config = manager.createKeyConfig()
-
-        let displayName = FileManager.default.displayName(atPath: url.absoluteString)
-        let iconFile = info["CFBundleIconFile"] as? String ?? ""
+        let appConfig = self.dataManager.createAppConfig(type: self.type)
+        
+        let displayName = bundle.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String
+            ?? bundle.object(forInfoDictionaryKey: kCFBundleNameKey as String) as? String
+            ?? url.deletingPathExtension().lastPathComponent
+        
+        // 尝试加载应用程序图标
+        let info = bundle.infoDictionary
+        let iconFile = info?["CFBundleIconFile"] as? String ?? ""
         if let iconURL = bundle.url(forResource: iconFile, withExtension: nil) {
             do {
                 let iconData = try Data(contentsOf: iconURL)
@@ -538,29 +535,34 @@ class GameController {
         self.data.addToAppConfigs(appConfig)
     }
     
+    // 移除应用程序配置
     func removeApp(_ app: AppConfig) {
         self.data.removeFromAppConfigs(app)
     }
     
+    // 切换按键映射启用状态
     @objc func toggleEnableKeyMappings() {
         self.isEnabled = !self.isEnabled
     }
     
+    // 断开控制器连接
     @objc func disconnect() {
         self.stopTimer()
         self.controller?.setHCIState(state: .disconnect)
     }
     
-    // MARK: - Timer
+    // MARK: - 定时器相关方法
 
+    // 更新最后访问时间
     func updateAccessTime() {
         self.lastAccess = Date(timeIntervalSinceNow: 0)
     }
     
+    // 启动定时器
     func startTimer() {
         self.stopTimer()
         
-        let checkInterval: TimeInterval = 1 * 60 // 1 min
+        let checkInterval: TimeInterval = 1 * 60 // 1分钟
         self.timer = Timer.scheduledTimer(withTimeInterval: checkInterval, repeats: true) { [weak self] _ in
             if AppSettings.disconnectTime <= 0 { return }
             guard let lastAccess = self?.lastAccess else { return }
@@ -574,6 +576,7 @@ class GameController {
         self.updateAccessTime()
     }
     
+    // 停止定时器
     func stopTimer() {
         self.timer?.invalidate()
         self.timer = nil

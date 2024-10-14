@@ -11,7 +11,7 @@ import ServiceManagement
 import UserNotifications
 import JoyConSwift
 
-let helperAppID: CFString = "jp.0spec.JoyKeyMapperLauncher" as CFString
+let helperAppID: CFString = "JoyKeyMapperLauncher" as CFString
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, UNUserNotificationCenterDelegate {
@@ -25,19 +25,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, UNUserNoti
     var controllers: [GameController] = []
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        // Insert code here to initialize your application
-        
-        // Window initialization
+        // 初始化窗口
         let storyboard = NSStoryboard(name: "Main", bundle: nil)
         self.windowController = storyboard.instantiateController(withIdentifier: "JoyKeyMapperWindowController") as? NSWindowController
         
-        // Menu settings
+        // 设置菜单
         let icon = NSImage(named: "menu_icon")
         icon?.size = NSSize(width: 24, height: 24)
         self.statusItem.button?.image = icon
         self.statusItem.menu = self.menu
 
-        // Set controller handlers
+        // 设置控制器处理程序
         self.manager.connectHandler = { [weak self] controller in
             self?.connectController(controller)
         }
@@ -45,36 +43,42 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, UNUserNoti
             self?.disconnectController(controller)
         }
         
+        // 初始化数据管理器
         self.dataManager = DataManager() { [weak self] manager in
             guard let strongSelf = self else { return }
             guard let dataManager = manager else { return }
 
+            // 加载已保存的控制器数据
             dataManager.controllers.forEach { data in
                 let gameController = GameController(data: data, dataManager: dataManager)
                 strongSelf.controllers.append(gameController)
             }
             _ = strongSelf.manager.runAsync()
             
+            // 添加应用程序切换观察者
             NSWorkspace.shared.notificationCenter.addObserver(strongSelf, selector: #selector(strongSelf.didActivateApp), name: NSWorkspace.didActivateApplicationNotification, object: nil)
             
             NotificationCenter.default.post(name: .controllerAdded, object: nil)
         }
         
+        // 更新控制器菜单
         self.updateControllersMenu()
         NotificationCenter.default.addObserver(self, selector: #selector(controllerIconChanged), name: .controllerIconChanged, object: nil)
         
-        // Notification settings
+        // 设置通知中心
         let center = UNUserNotificationCenter.current()
         center.delegate = self
     }
     
-    // MARK: - Menu
+    // MARK: - 菜单相关方法
     
+    // 打开关于窗口
     @IBAction func openAbout(_ sender: Any) {
         NSApplication.shared.activate(ignoringOtherApps: true)
         NSApplication.shared.orderFrontStandardAboutPanel(NSApplication.shared)
     }
     
+    // 打开设置窗口
     @IBAction func openSettings(_ sender: Any) {
         NSApplication.shared.activate(ignoringOtherApps: true)
         self.windowController?.showWindow(self)
@@ -82,10 +86,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, UNUserNoti
         self.windowController?.window?.delegate = self
     }
     
+    // 退出应用程序
     @IBAction func quit(_ sender: Any) {
         NSApplication.shared.terminate(self)
     }
 
+    // 更新控制器菜单
     func updateControllersMenu() {
         self.controllersMenu?.submenu?.removeAllItems()
 
@@ -99,7 +105,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, UNUserNoti
             
             item.submenu = NSMenu()
             
-            // Enable key mappings menu
+            // 启用按键映射菜单项
             let enabled = NSMenuItem()
             enabled.title = NSLocalizedString("Enable key mappings", comment: "Enable key mappings")
             enabled.action = Selector(("toggleEnableKeyMappings"))
@@ -107,17 +113,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, UNUserNoti
             enabled.target = controller
             item.submenu?.addItem(enabled)
 
-            // Disconnect menu
+            // 断开连接菜单项
             let disconnect = NSMenuItem()
             disconnect.title = NSLocalizedString("Disconnect", comment: "Disconnect")
             disconnect.action = Selector(("disconnect"))
             disconnect.target = controller
             item.submenu?.addItem(disconnect)
             
-            // Separator
+            // 分隔线
             item.submenu?.addItem(NSMenuItem.separator())
 
-            // Battery info
+            // 电池信息
             let battery = NSMenuItem()
             if controller.controller?.battery ?? .unknown != .unknown {
                 var chargeString = ""
@@ -134,6 +140,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, UNUserNoti
             self.controllersMenu?.submenu?.addItem(item)
         }
         
+        // 如果没有连接的控制器，显示提示信息
         if let itemCount = self.controllersMenu?.submenu?.items.count, itemCount <= 0 {
             let item = NSMenuItem()
             let noControllers = NSLocalizedString("No controllers connected", comment: "No controllers connected")
@@ -143,45 +150,52 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, UNUserNoti
         }
     }
     
-    // MARK: - Helper app settings
+    // MARK: - 辅助应用程序设置
     
+    // 设置登录项
     func setLoginItem(enabled: Bool) {
         let succeeded = SMLoginItemSetEnabled(helperAppID, enabled)
         if (!succeeded) {
-            
+            // 处理设置失败的情况
         }
     }
     
     // MARK: - NSWindowDelegate
     
+    // 窗口关闭时保存数据
     func windowWillClose(_ notification: Notification) {
         _ = self.dataManager?.save()
     }
     
-    // MARK: - Notifications
+    // MARK: - 通知处理
     
+    // 控制器图标变更通知处理
     @objc func controllerIconChanged(_ notification: NSNotification) {
         self.updateControllersMenu()
     }
     
     // MARK: - UNUserNotificationCenterDelegate
 
+    // 处理通知展示
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         completionHandler([.alert, .badge, .sound])
     }
     
+    // 处理通知响应
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         completionHandler()
     }
 
-    // MARK: - Controller event handlers
+    // MARK: - 控制器事件处理
 
+    // 应用程序终止时断开所有控制器
     func applicationWillTerminate(_ aNotification: Notification) {
         self.controllers.forEach { controller in
             controller.controller?.setHCIState(state: .disconnect)
         }
     }
     
+    // 连接控制器
     func connectController(_ controller: JoyConSwift.Controller) {
         if let gameController = self.controllers.first(where: {
             $0.data.serialID == controller.serialID
@@ -197,6 +211,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, UNUserNoti
         self.updateControllersMenu()
     }
 
+    // 断开控制器连接（菜单操作）
     @objc func disconnectController(sender: Any) {
         guard let item = sender as? NSMenuItem else { return }
         guard let gameController = item.representedObject as? GameController else { return }
@@ -205,6 +220,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, UNUserNoti
         self.updateControllersMenu()
     }
     
+    // 断开控制器连接
     func disconnectController(_ controller: JoyConSwift.Controller) {
         if let gameController = self.controllers.first(where: {
             $0.data.serialID == controller.serialID
@@ -218,10 +234,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, UNUserNoti
         self.updateControllersMenu()
     }
 
+    // 添加新控制器
     func addController(_ controller: JoyConSwift.Controller) {
         guard let dataManager = self.dataManager else { return }
         let controllerData = dataManager.getControllerData(controller: controller)
-        let gameController = GameController(data: controllerData,dataManager: self.dataManager!)
+        let gameController = GameController(data: controllerData, dataManager: self.dataManager!)
         gameController.controller = controller
         gameController.startTimer()
         self.controllers.append(gameController)
@@ -231,6 +248,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, UNUserNoti
         AppNotifications.notifyControllerConnected(gameController)
     }
     
+    // 移除控制器
     func removeController(_ controller: JoyConSwift.Controller) {
         guard let gameController = self.controllers.first(where: {
             $0.data.serialID == controller.serialID
@@ -238,6 +256,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, UNUserNoti
         self.removeController(gameController: gameController)
     }
     
+    // 移除游戏控制器
     func removeController(gameController controller: GameController) {
         controller.controller?.setHCIState(state: .disconnect)
 
@@ -246,24 +265,29 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, UNUserNoti
         NotificationCenter.default.post(name: .controllerRemoved, object: controller)
     }
 
-    // MARK: - Core Data Saving and Undo support
+    // MARK: - Core Data 保存和撤销支持
 
+    // 保存操作
     @IBAction func saveAction(_ sender: AnyObject?) {
         _ = self.dataManager?.save()
     }
 
+    // 获取撤销管理器
     func windowWillReturnUndoManager(_ window: NSWindow) -> UndoManager? {
         return self.dataManager?.undoManager
     }
 
+    // 关闭最后一个窗口时不退出应用
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
         return false
     }
     
+    // 应用程序退出前的处理
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
         let isSucceeded = self.dataManager?.save() ?? false
         
         if !isSucceeded {
+            // 如果保存失败，询问用户是否仍要退出
             let question = NSLocalizedString("Could not save changes while quitting. Quit anyway?", comment: "Quit without saves error question message")
             let info = NSLocalizedString("Quitting now will lose any changes you have made since the last successful save", comment: "Quit without saves error question info");
             let quitButton = NSLocalizedString("Quit anyway", comment: "Quit anyway button title")
@@ -283,8 +307,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, UNUserNoti
         return .terminateNow
     }
     
-    // MARK: - Context switch handling
+    // MARK: - 上下文切换处理
     
+    // 处理应用程序激活事件
     @objc func didActivateApp(notification: Notification) {
         guard let app = notification.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication,
             let bundleID = app.bundleIdentifier else { return }
